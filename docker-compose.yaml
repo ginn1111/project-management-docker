@@ -1,0 +1,52 @@
+version: '3.3'
+services:
+  db:
+    image: mcr.microsoft.com/azure-sql-edge 
+    volumes:
+      - ~/sql-server/data:/var/opt/mssql/data
+      - ~/sql-server/log:/var/opt/mssql/log
+      - ~/sql-server/secrets:/var/opt/mssql/secrets
+    environment:
+      - ACCEPT_EULA=1
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+    ports:
+      - 1433:1433
+    networks:
+      - project-manage
+
+  server:
+    build:
+      context: ./project-management-server/
+      dockerfile: ./Dockerfile
+    image: gin1111/project-management-server 
+    depends_on:
+      - db
+    ports:
+      - 8080:8080
+    networks:
+      - project-manage
+      - back-end
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
+      - SEND_GRID_API_KEY=${SEND_GRID_API_KEY}
+    restart: unless-stopped
+
+  client:
+    build:
+      context: ./project-management-client/
+      dockerfile: ./Dockerfile
+    image: gin1111/project-manage-client
+    ports:
+      - 3000:3000
+    networks:
+      - back-end
+    environment:
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - NEXTAUTH_URL=${NEXTAUTH_URL}
+      - BASE_URL=${BASE_URL}
+    restart: unless-stopped
+
+networks:
+  project-manage:
+  back-end:

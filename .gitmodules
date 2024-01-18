@@ -1,0 +1,6 @@
+[submodule "project-management-client"]
+	path = project-management-client
+	url = https://github.com/ginn1111/project-management-client
+[submodule "project-management-server"]
+	path = project-management-server
+	url = https://github.com/ginn1111/project-management-server
